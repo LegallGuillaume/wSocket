@@ -10,11 +10,11 @@ class WSoServ:
     def get_clients(self):
         return self._wth._clients
 
-    def start_server(self):
+    def start(self):
         self._wth.start()
         self._flag_running = True
 
-    def stop_server(self):
+    def stop(self):
         self._wth.close_server()
         self._flag_running = False
 

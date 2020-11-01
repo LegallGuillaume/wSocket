@@ -84,9 +84,15 @@ class WSThread(threading.Thread):
                 rowdata = json.loads(message)
                 for channel, data in rowdata.items():
                     if channel in self._channel:
-                        self._channel[channel](websocket, data)
+                        jdata = data
+                        if isinstance(jdata, str):
+                            jdata = json.loads(data)
+                        if 'message' in jdata:
+                            self._channel[channel](jdata['message'])
+                            continue
+                        self._channel[channel](data)
                     elif self.unknown_channel:
-                        self.unknown_channel(websocket, data)
+                        self.unknown_channel(data)
             except (websockets.exceptions.ConnectionClosedError, websockets.exceptions.ConnectionClosedOK):
                 break
         await self._unregister_client(websocket)

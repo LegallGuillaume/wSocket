@@ -4,21 +4,21 @@ import asyncio
 import time
 import json
 
-def channel_serv_1(client, data):
-    print('server channel_1: ', client, data)
+def channel_serv_1(data):
+    print('server channel_1: ', data)
 
 def channel_cli_1(data):
-    print('client channel_1: ', data)
+    print('client 1 channel_1: ', data)
 
 def channel_cli_2(data):
-    print('client channel_2: ', data)
+    print('client 2 channel_1: ', data)
 
 def broadcast(data):
     print('Broadcast: ', data)
 
 serv = WSoServ(url='127.0.0.1', port=8766)
 serv.add_channel('channel_1', channel_serv_1)
-serv.start_server()
+serv.start()
 
 cli = WSoClient(url='127.0.0.1', port=8766, broadcast=broadcast, channel={'channel_1': channel_cli_1})
 cli.connect()
@@ -40,3 +40,4 @@ serv.send('channel_1', {"key": "value"})
 time.sleep(3)
 
 serv.send('', {"all": "test"})
+serv.send('channel_1', "This is a message from server to channel_1")

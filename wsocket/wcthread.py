@@ -58,6 +58,12 @@ class WCThread(threading.Thread):
                     jrowdata = json.loads(message)
                     for channel, data in jrowdata.items():
                         if channel in self._channel:
+                            jdata = data
+                            if isinstance(jdata, str):
+                                jdata = json.loads(data)
+                            if 'message' in jdata:
+                                self._channel[channel](jdata['message'])
+                                continue
                             self._channel[channel](data)
                         elif channel == '':
                             self.broadcast_fn(data)
