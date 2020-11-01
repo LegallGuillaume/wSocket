@@ -7,6 +7,9 @@ class WSoServ:
         self._wth = WSThread(**kwargs)
         self._flag_running = False
 
+    def get_clients(self):
+        return self._wth._clients
+
     def start_server(self):
         self._wth.start()
         self._flag_running = True

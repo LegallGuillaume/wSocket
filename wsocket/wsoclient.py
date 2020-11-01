@@ -10,6 +10,10 @@ class WSoClient:
         self._cli.start()
         self._flag_running = True
 
+    def close(self):
+        self._cli.stop_client()
+        self._flag_running = False
+
     def send(self, channel, data) -> bool:
         if not self._flag_running:
             return False

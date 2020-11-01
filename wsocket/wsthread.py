@@ -11,6 +11,7 @@ class WSThread(threading.Thread):
         self.url = kwargs.pop('url', '127.0.0.1')
         self.path = kwargs.pop('path', '/')
         self.unknown_channel = kwargs.pop('unknown_channel', None)
+        self._channel = kwargs.pop('channel', {})
         if not asyncio.iscoroutinefunction(self.unknown_channel):
             self.unknown_channel = None
         if self.path.startswith('/'):
@@ -21,7 +22,6 @@ class WSThread(threading.Thread):
         self._flag_running = False
         self._queue = asyncio.Queue(loop=self._loop)
         threading.Thread.__init__(self, name=thread_name)
-        self._channel = {}
         self._clients = []
 
     def run(self):
@@ -33,6 +33,10 @@ class WSThread(threading.Thread):
     def close_server(self):
         self._flag_running = False
         self._srv.close()
+        super().join()
+
+    def get_clients(self):
+        return self._clients
 
     def send(self, channel, data):
         if isinstance(data, str):

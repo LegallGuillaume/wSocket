@@ -20,14 +20,13 @@ serv = WSoServ(url='127.0.0.1', port=8766)
 serv.add_channel('channel_1', channel_serv_1)
 serv.start_server()
 
-cli = WSoClient(url='127.0.0.1', port=8766, broadcast=broadcast)
-cli.add_channel('channel_1', channel_cli_1)
+cli = WSoClient(url='127.0.0.1', port=8766, broadcast=broadcast, channel={'channel_1': channel_cli_1})
 cli.connect()
 
 time.sleep(3)
 
-cli.send('channel_1', json.dumps({"conf": "Ceci est un test"}))
-cli.send('channel_1', {"conf": "Ceci est un test"})
+cli.send('channel_1', "This is a message !")
+cli.send('channel_1', {"conf": "This is a test"})
 
 cli2 = WSoClient(url='127.0.0.1', port=8766, broadcast=broadcast)
 cli2.add_channel('channel_1', channel_cli_2)
@@ -41,4 +40,3 @@ serv.send('channel_1', {"key": "value"})
 time.sleep(3)
 
 serv.send('', {"all": "test"})
-

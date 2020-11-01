@@ -11,13 +11,13 @@ class WCThread(threading.Thread):
         self.url = kwargs.pop('url', '127.0.0.1')
         self.path = kwargs.pop('path', '/')
         self.broadcast_fn = kwargs.pop('broadcast', self._broadcast)
+        self._channel = kwargs.pop('channel', {})
         if self.path.startswith('/'):
             self.path = self.path[1:]
 
         if kwargs:
             raise Exception('Argument error ', kwargs)
         threading.Thread.__init__(self, name=thread_name)
-        self._channel = {}
 
     def run(self):
         self._cli = None
@@ -25,6 +25,14 @@ class WCThread(threading.Thread):
 
     def add_channel(self, channel, fnptr):
         self._channel[channel] = fnptr
+
+    def stop_client(self):
+        try:
+            coro = self._cli.send("<QUIT>")
+            asyncio.run_coroutine_threadsafe(coro, self._loop)
+        except websockets.exceptions.ConnectionClosed:
+            pass
+        super().join()
 
     def send(self, channel, data):
         if not self._cli:
@@ -44,6 +52,9 @@ class WCThread(threading.Thread):
             while True:
                 try:
                     message = await self._cli.recv()
+                    if message == '<QUIT>':
+                        client.close()
+                        break
                     jrowdata = json.loads(message)
                     for channel, data in jrowdata.items():
                         if channel in self._channel:
